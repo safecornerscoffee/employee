@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
 
 	_ "github.com/lib/pq"
@@ -40,6 +41,13 @@ func main() {
 	}
 
 	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
+	}))
 
 	type Employee struct {
 		Id     string `json:"id"`
@@ -145,5 +153,5 @@ func main() {
 		//return c.String(http.StatusOK, "ok")
 	})
 
-	e.Start(":8080")
+	e.Logger.Fatal(e.Start(":8080"))
 }
